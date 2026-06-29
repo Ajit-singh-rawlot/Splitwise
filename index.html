@@ -197,12 +197,6 @@ select.form-input{appearance:none}
 .color-swatches{display:flex;gap:8px;flex-wrap:wrap}
 .swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
 .swatch.sel{border-color:white}
-
-/* DEBUG PANEL */
-#debugBtn{position:fixed;left:16px;bottom:16px;width:48px;height:48px;border:none;border-radius:50%;background:#ff9800;color:#fff;font-size:22px;z-index:999999}
-#debugPanel{display:none;position:fixed;inset:10px;background:#111;color:#0f0;z-index:1000000;border:1px solid #555;border-radius:10px;padding:10px;font-family:monospace;font-size:12px}
-#debugLogs{height:calc(100% - 45px);overflow:auto;white-space:pre-wrap}
-
 </style>
 </head>
 <body>
@@ -421,7 +415,7 @@ window.addEventListener('load', function() {
 // ── FIREBASE CONFIG ──────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyCdaSeiBxEpdGa947wEPmjQvr3uRsDRC1U",
-  authDomain: "splitwise-876db.firebaseapp.com",
+  authDomain: "ajit-singh-rawlot.github.io",
   databaseURL: "https://splitwise-876db-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "splitwise-876db",
   storageBucket: "splitwise-876db.firebasestorage.app",
@@ -516,8 +510,10 @@ auth.onAuthStateChanged(user => {
 
 function signInWithGoogle(){
   const provider = new firebase.auth.GoogleAuthProvider();
-  // Use redirect instead of popup — works on all domains including GitHub Pages
-  auth.signInWithRedirect(provider).catch(e => toast(e.message, true));
+  // Must match exactly where the app is hosted including subfolder
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
+    auth.signInWithRedirect(provider);
+  }).catch(e => toast(e.message, true));
 }
 function signOut(){
   auth.signOut();
@@ -1172,38 +1168,5 @@ window.seedLadakh = seedLadakh;
 
 }); // end window.addEventListener('load')
 </script>
-
-<button id="debugBtn">🐞</button>
-<div id="debugPanel">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<b>Debug Console</b>
-<div>
-<button onclick="navigator.clipboard.writeText(document.getElementById('debugLogs').innerText)">Copy</button>
-<button onclick="document.getElementById('debugLogs').innerHTML=''">Clear</button>
-<button onclick="document.getElementById('debugPanel').style.display='none'">Close</button>
-</div>
-</div>
-<div id="debugLogs"></div>
-</div>
-<script>
-(function(){
-function ready(){
-const btn=document.getElementById('debugBtn');
-const panel=document.getElementById('debugPanel');
-const logs=document.getElementById('debugLogs');
-btn.onclick=()=>panel.style.display=panel.style.display==='block'?'none':'block';
-function add(t,m){logs.textContent+=`[${t}] ${m}\n`;logs.scrollTop=logs.scrollHeight;}
-const l=console.log,e=console.error,w=console.warn;
-console.log=(...a)=>{l.apply(console,a);add('LOG',a.join(' '));};
-console.warn=(...a)=>{w.apply(console,a);add('WARN',a.join(' '));};
-console.error=(...a)=>{e.apply(console,a);add('ERROR',a.join(' '));};
-window.onerror=(m,s,ln,col)=>add('JS',`${m} @ ${ln}:${col}`);
-window.addEventListener('unhandledrejection',ev=>add('PROMISE',String(ev.reason)));
-add('INFO','Debug console initialized');
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();
-})();
-</script>
-
 </body>
 </html>
